@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
@@ -13,7 +13,8 @@ import { Loader2 } from "lucide-react";
 import { handleAuthTokens } from "@/lib/utils";
 import { handleGoogleCallback } from "@/lib/auth/google";
 
-export default function GoogleCallback() {
+// Create a separate component for the callback logic
+function CallbackHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -33,6 +34,11 @@ export default function GoogleCallback() {
     fetchData();
   }, [router, searchParams]);
 
+  return null;
+}
+
+// Main component
+export default function GoogleCallback() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-900 p-4">
       <Card className="w-[380px] shadow-lg">
@@ -71,6 +77,9 @@ export default function GoogleCallback() {
           </p>
         </CardContent>
       </Card>
+      <Suspense fallback={null}>
+        <CallbackHandler />
+      </Suspense>
     </div>
   );
 }

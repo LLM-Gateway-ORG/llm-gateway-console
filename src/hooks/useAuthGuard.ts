@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import Cookies from "js-cookie";
 import { getUserProfile, refreshToken } from "@/lib/auth/google";
 

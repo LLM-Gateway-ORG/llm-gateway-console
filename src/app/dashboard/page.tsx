@@ -1,6 +1,5 @@
 'use client'
 
-import Navbar from "@/components/ui/navbar"
 import Sidebar from "@/components/sidebar"
 import { useAuthGuard } from '@/hooks/useAuthGuard';
 
