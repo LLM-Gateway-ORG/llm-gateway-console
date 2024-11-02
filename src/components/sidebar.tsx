@@ -16,12 +16,12 @@ import {
 } from "@/components/ui/sidebar"
 import { Bot, Key, LayoutDashboard, Settings, LogOut, User } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const sidebarItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Bot, label: "Models", href: "/models" },
   { icon: Bot, label: "Playground", href: "/playground" },
   { icon: Key, label: "API Keys", href: "/api-keys" },
@@ -37,9 +37,21 @@ interface SidebarProps {
 
 export default function SidebarComponent({ user }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
 
   const handleLogout = () => {
-    console.log("Logging out...")
+    // Clear localStorage
+    localStorage.clear()
+    
+    // Clear all cookies
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=")
+      const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim()
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
+    })
+
+    // Redirect to auth page
+    router.push('/auth')
   }
 
   return (
@@ -92,7 +104,7 @@ export default function SidebarComponent({ user }: SidebarProps) {
                 asChild
                 className="hover:bg-[#4285F4]/10"
               >
-                <Link href="/settings" className="flex items-center font-bold">
+                <Link href="/dashboard/settings" className="flex items-center font-bold">
                   <Settings className="mr-3 h-4 w-4" />
                   Settings
                 </Link>
