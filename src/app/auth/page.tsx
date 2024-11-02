@@ -14,10 +14,18 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { initiateGoogleLogin } from "@/lib/auth/google";
+import { signIn, signUp } from "@/lib/auth";
+import { handleAuthTokens } from "@/lib/utils";
 
 export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignIn, setIsSignIn] = useState(true);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
 
   const router = useRouter();
 
@@ -28,6 +36,39 @@ export default function AuthPage() {
     } catch (error) {
       console.error("Google login error:", error);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      let data;
+      if (isSignIn) {
+        data = await signIn(formData.email, formData.password);
+      } else {
+        data = await signUp({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        });
+      }
+
+      if (handleAuthTokens(data)) {
+        router.push("/dashboard");
+      } else {
+        throw new Error("Failed to authenticate");
+      }
+    } catch (error) {
+      console.error("Authentication error:", error);
+      // You might want to add user-facing error handling here
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   return (
@@ -112,29 +153,45 @@ export default function AuthPage() {
               </TabsList>
             </Tabs>
 
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-4">
                 {!isSignIn && (
                   <div className="flex flex-row gap-2">
                     <Input
                       type="text"
+                      name="firstName"
                       placeholder="First Name"
                       className="h-12"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
                     />
                     <Input
                       type="text"
+                      name="lastName"
                       placeholder="Last Name"
                       className="h-12"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
                     />
                   </div>
                 )}
-                <Input type="email" placeholder="Email" className="h-12" />
+                <Input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  className="h-12"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
 
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
+                    name="password"
                     placeholder="Password"
                     className="h-12 pr-10"
+                    value={formData.password}
+                    onChange={handleInputChange}
                   />
                   <button
                     type="button"
@@ -150,12 +207,18 @@ export default function AuthPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full h-12 text-base bg-blue-500 text-white hover:bg-blue-600">
+              <Button
+                type="submit"
+                className="w-full h-12 text-base bg-blue-500 text-white hover:bg-blue-600"
+              >
                 {isSignIn ? "Sign In" : "Sign Up"}
               </Button>
 
               {isSignIn && (
-                <Button variant="ghost" className="w-full font-normal text-sm text-blue-500 hover:underline">
+                <Button
+                  variant="ghost"
+                  className="w-full font-normal text-sm text-blue-500 hover:underline"
+                >
                   Forgot password?
                 </Button>
               )}

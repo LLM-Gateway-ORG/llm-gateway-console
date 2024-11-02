@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import Cookies from "js-cookie";
+import { handleAuthTokens } from "@/lib/utils";
 import { handleGoogleCallback } from "@/lib/auth/google";
 
 export default function GoogleCallback() {
@@ -22,18 +22,11 @@ export default function GoogleCallback() {
       const code = searchParams.get("code");
       if (code) {
         const data = await handleGoogleCallback(code);
-        console.log(data);
-        if (
-          data?.jwt_tokens &&
-          data?.jwt_tokens?.access &&
-          data?.jwt_tokens?.refresh
-        ) {
-          Cookies.set("access_token", data.jwt_tokens.access);
-          Cookies.set("refresh_token", data.jwt_tokens.refresh);
+        if (data?.jwt_tokens && handleAuthTokens(data.jwt_tokens)) {
           router.push("/dashboard");
         } else {
           router.push("/auth");
-        }
+        } 
       }
     };
 
