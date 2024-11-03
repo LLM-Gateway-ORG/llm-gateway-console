@@ -54,7 +54,7 @@ export default function SidebarComponent({ user }: SidebarProps) {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="w-auto">
       <Sidebar className="border-r bg-white">
         <SidebarHeader>
           <SidebarMenu className="p-4">
