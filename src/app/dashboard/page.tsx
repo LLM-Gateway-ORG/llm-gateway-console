@@ -1,6 +1,5 @@
 'use client'
 
-import Sidebar from "@/components/sidebar"
 import { useAuthGuard } from '@/hooks/useAuthGuard';
 
 export default function Dashboard() {
@@ -15,14 +14,9 @@ export default function Dashboard() {
   }
   
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <div className="flex flex-1">
-        <Sidebar user={user} />
-        <main className="flex-1 p-6 bg-white shadow-md rounded-lg m-4">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Welcome, {user.firstname} {user.lastname}!</h2>
-          <p className="text-gray-600">This is your dashboard. You can add more content here.</p>
-        </main>
-      </div>
-    </div>
+    <>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Welcome, {user.firstname} {user.lastname}!</h2>
+      <p className="text-gray-600">This is your dashboard. You can add more content here.</p>
+    </>
   );
 }
