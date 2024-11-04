@@ -23,7 +23,7 @@ const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Bot, label: "Models", href: "/models" },
   { icon: Bot, label: "Playground", href: "/playground" },
-  { icon: Key, label: "API Keys", href: "/api-keys" },
+  { icon: Key, label: "Providers", href: "/dashboard/providers" },
 ]
 
 interface SidebarProps {
