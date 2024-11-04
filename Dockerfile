@@ -8,13 +8,17 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 
 # Copy the rest of the application code
 COPY . .
 
-# Build the application (if needed)
-RUN npm run build
+# Build the application
+RUN npm run build && \
+    # Clean up npm cache and unnecessary files to reduce image size
+    npm cache clean --force && \
+    rm -rf /root/.npm
+
 
 # Expose the port the app runs on
 EXPOSE 3000
