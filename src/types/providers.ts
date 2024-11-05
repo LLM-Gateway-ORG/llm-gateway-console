@@ -6,10 +6,9 @@ export interface ProviderKey {
 }
 
 export interface AIModel {
-  model_name: string;
+  name: string;
   provider: string;
-  description: string;
-  //   max_tokens: number;
+  developer: string;
 }
 
 export interface ModelsResponse {
