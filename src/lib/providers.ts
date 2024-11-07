@@ -1,3 +1,4 @@
+import { api } from "@/lib/utils";
 import { ProviderKey, ModelsResponse } from "../types/providers";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -10,7 +11,7 @@ export async function getAIModels(
   if (params?.name) queryParams.append("name", params.name);
   if (params?.provider) queryParams.append("provider", params.provider);
 
-  const response = await fetch(
+  const response = await api.get(
     `${API_BASE_URL}/api/provider/ai/models/?${queryParams.toString()}`,
     {
       headers: {
@@ -20,61 +21,61 @@ export async function getAIModels(
     }
   );
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     throw new Error("Failed to fetch AI models");
   }
 
-  return response.json();
+  return response.data;
 }
 
 export async function getProviders(token: string): Promise<ProviderKey[]> {
-  const response = await fetch(`${API_BASE_URL}/api/provider/`, {
+  const response = await api.get(`${API_BASE_URL}/api/provider/`, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   });
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     throw new Error("Failed to fetch providers");
   }
 
-  return response.json();
+  return response.data;
 }
 
 export async function createProvider(
   token: string,
   data: { provider: string; api_key: string }
 ): Promise<ProviderKey> {
-  const response = await fetch(`${API_BASE_URL}/api/provider/`, {
-    method: "POST",
+  const response = await api.post(`${API_BASE_URL}/api/provider/`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     throw new Error("Failed to create provider");
   }
 
-  return response.json();
+  return response.data;
 }
 
 export async function deleteProvider(
   token: string,
   providerId: string
 ): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/provider/${providerId}/`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await api.delete(
+    `${API_BASE_URL}/api/provider/${providerId}/`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     throw new Error("Failed to delete provider");
   }
 }
@@ -84,37 +85,41 @@ export async function updateProvider(
   providerId: string,
   data: Partial<{ provider: string; api_key: string; name: string }>
 ): Promise<ProviderKey> {
-  const response = await fetch(`${API_BASE_URL}/api/provider/${providerId}/`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await api.put(
+    `${API_BASE_URL}/api/provider/${providerId}/`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     throw new Error("Failed to update provider");
   }
 
-  return response.json();
+  return response.data;
 }
 
 export async function getProviderDetails(
   token: string,
   providerId: string
 ): Promise<ProviderKey> {
-  const response = await fetch(`${API_BASE_URL}/api/provider/${providerId}/`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await api.get(
+    `${API_BASE_URL}/api/provider/${providerId}/`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-  if (!response.ok) {
+  if (response.status < 200 || response.status >= 300) {
     throw new Error("Failed to update provider");
   }
 
-  return response.json();
+  return response.data;
 }

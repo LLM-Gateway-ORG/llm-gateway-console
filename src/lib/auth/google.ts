@@ -1,4 +1,5 @@
 import axios from "axios";
+import { api } from "@/lib/utils";
 
 export async function initiateGoogleLogin() {
   try {
@@ -25,7 +26,7 @@ export async function handleGoogleCallback(code: string) {
 }
 
 export async function getUserProfile(access_token: string) {
-  const { data } = await axios.get(
+  const { data } = await api.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile/`,
     {
       headers: {

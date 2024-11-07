@@ -1,4 +1,5 @@
 import axios from "axios";
+import { api } from "@/lib/utils";
 
 export async function signIn(email: string, password: string) {
   const response = await axios.post(
@@ -37,27 +38,25 @@ export const resetPassword = async (
   oldPassword: string,
   newPassword: string
 ) => {
-  const response = await fetch(
+  const response = await api.post(
     `${process.env.NEXT_PUBLIC_API_URL}/api/auth/password/reset/`,
     {
-      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${access_token}`,
       },
-      body: JSON.stringify({
+      data: {
         old_password: oldPassword,
         new_password: newPassword,
-      }),
+      },
     }
   );
 
-  if (!response.ok) {
-    const data = await response.json().catch(() => null);
-    throw new Error(data?.message || "Failed to reset password");
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error("Failed to reset password");
   }
 
-  return response.json();
+  return response.data;
 };
 
 // Password validation utilities
