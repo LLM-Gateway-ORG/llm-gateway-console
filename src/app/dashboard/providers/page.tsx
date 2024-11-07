@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Plus, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -73,16 +73,10 @@ export default function ProvidersPage() {
     setProvidersList(data.available_providers);
   };
 
-  // Fetch providers on component mount
-  useEffect(() => {
-    fetchAiModels();
-    fetchProviders();
-  }, []);
-
-  const fetchProviders = async () => {
+  // Wrap fetchProviders in useCallback
+  const fetchProviders = useCallback(async () => {
     try {
       setIsLoading(true);
-      // You'll need to implement getting the token from your auth system
       const token = Cookies.get("access_token");
       if (!token) {
         throw new Error("No authentication token found");
@@ -97,16 +91,22 @@ export default function ProvidersPage() {
           api_key: provider.api_key,
         }))
       );
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({
         title: "Error",
-        description: "Failed to fetch providers",
+        description: error.message || "Failed to fetch providers",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]); // Add dependencies used inside the callback
+
+  useEffect(() => {
+    fetchAiModels();
+    fetchProviders();
+  }, [fetchProviders]); // Now this is safe to use as a dependency
 
   const handleCreateKey = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -133,10 +133,11 @@ export default function ProvidersPage() {
         title: "Success",
         description: "Provider created successfully",
       });
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({
         title: "Error",
-        description: "Failed to create provider",
+        description: error.message || "Failed to create provider",
         variant: "destructive",
       });
     } finally {
@@ -157,10 +158,11 @@ export default function ProvidersPage() {
         title: "Success",
         description: "Provider deleted successfully",
       });
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({
         title: "Error",
-        description: "Failed to delete provider",
+        description: error.message || "Failed to delete provider",
         variant: "destructive",
       });
     } finally {
@@ -219,10 +221,11 @@ export default function ProvidersPage() {
         title: "Success",
         description: "API Key updated successfully",
       });
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({
         title: "Error",
-        description: "Failed to update API Key",
+        description: error.message || "Failed to update API Key",
         variant: "destructive",
       });
     } finally {

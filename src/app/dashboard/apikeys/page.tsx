@@ -46,10 +46,11 @@ export default function ApiKeysPage() {
       if (!token) throw new Error("No authentication token found");
       const keys = await getApiKeys(token);
       setApiKeys(keys);
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({
         title: "Error",
-        description: "Failed to fetch API keys",
+        description: error.message || "Failed to fetch API keys",
         variant: "destructive",
       });
     }
@@ -96,10 +97,11 @@ export default function ApiKeysPage() {
         title: "Success",
         description: "API key created successfully",
       });
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({
         title: "Error",
-        description: "Failed to create API key",
+        description: error.message || "Failed to create API key",
         variant: "destructive",
       });
     } finally {
@@ -119,10 +121,11 @@ export default function ApiKeysPage() {
         title: "Success",
         description: "API key revoked successfully",
       });
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({
         title: "Error",
-        description: "Failed to revoke API key",
+        description: error.message || "Failed to revoke API key",
         variant: "destructive",
       });
     }
