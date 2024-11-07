@@ -22,8 +22,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Bot, label: "Models", href: "/dashboard/models" },
-  { icon: Bot, label: "Playground", href: "/dashboard/playground" },
   { icon: Key, label: "Providers", href: "/dashboard/providers" },
+  { icon: Key, label: "API Keys", href: "/dashboard/apikeys" },
 ]
 
 interface SidebarProps {
