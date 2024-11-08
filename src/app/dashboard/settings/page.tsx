@@ -24,7 +24,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import Cookies from "js-cookie";
 
 // Add form schema
 const passwordFormSchema = z

@@ -1,8 +1,6 @@
 import { api } from "@/lib/utils";
 import { ProviderKey, ModelsResponse } from "../types/providers";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
 export async function getAIModels(params?: {
   name?: string;
   provider?: string;
