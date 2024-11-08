@@ -28,9 +28,12 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = Cookies.get("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (!token) {
+      // Redirect to login
+      console.log("Redirecting to login");
+      window.location.href = "/auth";
     }
+    config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
@@ -43,7 +46,7 @@ api.interceptors.response.use(
       // Clear tokens
       Cookies.remove("access_token");
       Cookies.remove("refresh_token");
-      // Instead of using redirect, use window.location
+      // Redirect to login
       window.location.href = "/auth";
     }
     return Promise.reject(error);

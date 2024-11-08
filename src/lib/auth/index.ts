@@ -34,23 +34,15 @@ export async function signUp({
 }
 
 export const resetPassword = async (
-  access_token: string,
   oldPassword: string,
   newPassword: string
 ) => {
-  const response = await api.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/password/reset/`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${access_token}`,
-      },
-      data: {
-        old_password: oldPassword,
-        new_password: newPassword,
-      },
-    }
-  );
+  const response = await api.post(`/api/auth/password/reset/`, {
+    data: {
+      old_password: oldPassword,
+      new_password: newPassword,
+    },
+  });
 
   if (response.status < 200 || response.status >= 300) {
     throw new Error("Failed to reset password");

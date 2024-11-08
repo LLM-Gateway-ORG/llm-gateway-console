@@ -59,9 +59,7 @@ export default function Settings() {
     setIsLoading(true);
 
     try {
-      const access_token = Cookies.get("access_token");
-      if (!access_token) throw new Error("Not authenticated");
-      await resetPassword(access_token, values.oldPassword, values.newPassword);
+      await resetPassword(values.oldPassword, values.newPassword);
       form.reset();
       toast({
         title: "Success",

@@ -18,7 +18,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createApiKey, getApiKeys, revokeApiKey } from "@/lib/apikeys";
 import { ApiKey } from "@/types/apikeys";
-import Cookies from "js-cookie";
 import {
   Dialog,
   DialogContent,
@@ -42,9 +41,7 @@ export default function ApiKeysPage() {
 
   const fetchApiKeys = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) throw new Error("No authentication token found");
-      const keys = await getApiKeys(token);
+      const keys = await getApiKeys();
       setApiKeys(keys);
     } catch (err: unknown) {
       const error = err as Error;
@@ -72,9 +69,7 @@ export default function ApiKeysPage() {
 
     setLoading(true);
     try {
-      const token = Cookies.get("access_token");
-      if (!token) throw new Error("No authentication token found");
-      const response = await createApiKey(token, formData);
+      const response = await createApiKey(formData);
       // Update the list of API keys first
       setApiKeys([
         ...apiKeys,
@@ -111,9 +106,7 @@ export default function ApiKeysPage() {
 
   const handleRevoke = async (keyId: string) => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) throw new Error("No authentication token found");
-      await revokeApiKey(token, keyId);
+      await revokeApiKey(keyId);
 
       setApiKeys(apiKeys.filter((key) => key.id !== keyId));
 

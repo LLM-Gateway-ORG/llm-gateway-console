@@ -1,9 +1,8 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
-import Cookies from "js-cookie"
+import { useEffect, useState, useMemo } from "react";
 import { getAIModels } from "@/lib/providers";
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Table,
@@ -36,9 +35,7 @@ export default function ModelsPage() {
   const fetchModels = async () => {
     setIsLoading(true)
     try {
-      const token = Cookies.get("access_token")
-      if (!token) throw new Error("No authentication token found")
-      const data = await getAIModels(token)
+      const data = await getAIModels()
       setModels(data.models.map(model => ({
         name: model.name,
         provider: model.provider,

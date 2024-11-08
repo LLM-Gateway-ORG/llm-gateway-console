@@ -69,7 +69,7 @@ export default function ProvidersPage() {
     if (!token) {
       throw new Error("No authentication token found");
     }
-    const data = await getAIModels(token);
+    const data = await getAIModels();
     setProvidersList(data.available_providers);
   };
 
@@ -77,11 +77,7 @@ export default function ProvidersPage() {
   const fetchProviders = useCallback(async () => {
     try {
       setIsLoading(true);
-      const token = Cookies.get("access_token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-      const fetchedProviders = await getProviders(token);
+      const fetchedProviders = await getProviders();
       setKeys(
         fetchedProviders.map((provider) => ({
           id: provider.id,
@@ -114,12 +110,8 @@ export default function ProvidersPage() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      const token = Cookies.get("access_token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
 
-      const newProvider = await createProvider(token, {
+      const newProvider = await createProvider({
         provider: formData.get("provider") as string,
         api_key: formData.get("api-key") as string,
       });
@@ -148,11 +140,7 @@ export default function ProvidersPage() {
   const handleDeleteKey = async (keyId: string) => {
     try {
       setIsLoading(true);
-      const token = Cookies.get("access_token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-      await deleteProvider(token, keyId);
+      await deleteProvider(keyId);
       setKeys(keys.filter((k) => k.id !== keyId));
       toast({
         title: "Success",
@@ -178,13 +166,11 @@ export default function ProvidersPage() {
 
     let updatedApiKey = providerKey.api_key;
     if (!providerKey.isVisible) {
-      const token = Cookies.get("access_token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-      const details = await getProviderDetails(token, keyId);
+      const details = await getProviderDetails(keyId);
       const fullApiKey = details.api_key;
-      updatedApiKey = `${fullApiKey.slice(0, 2)}${'*'.repeat(fullApiKey.length - 6)}${fullApiKey.slice(-4)}`;
+      updatedApiKey = `${fullApiKey.slice(0, 2)}${"*".repeat(
+        fullApiKey.length - 6
+      )}${fullApiKey.slice(-4)}`;
     }
 
     setKeys(
@@ -202,14 +188,10 @@ export default function ProvidersPage() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      const token = Cookies.get("access_token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
 
       const updatedApiKey = formData.get("api-key") as string;
       // Assuming you have an updateProvider function
-      await updateProvider(token, currentKey!.id, { api_key: updatedApiKey });
+      await updateProvider(currentKey!.id, { api_key: updatedApiKey });
 
       setKeys(
         keys.map((key) =>
@@ -252,9 +234,12 @@ export default function ProvidersPage() {
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">Add New API Key</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">
+                Add New API Key
+              </DialogTitle>
               <DialogDescription className="text-sm text-gray-500">
-                Enter your API key details below. Make sure to keep your API keys secure.
+                Enter your API key details below. Make sure to keep your API
+                keys secure.
               </DialogDescription>
             </DialogHeader>
 
@@ -264,7 +249,9 @@ export default function ProvidersPage() {
               autoComplete="off"
             >
               <div className="space-y-2">
-                <Label htmlFor="provider" className="text-sm font-medium">Provider</Label>
+                <Label htmlFor="provider" className="text-sm font-medium">
+                  Provider
+                </Label>
                 <Select name="provider" required>
                   <SelectTrigger className="border-gray-300">
                     <SelectValue placeholder="Select a provider" />
@@ -280,7 +267,9 @@ export default function ProvidersPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="api-key" className="text-sm font-medium">API Key</Label>
+                <Label htmlFor="api-key" className="text-sm font-medium">
+                  API Key
+                </Label>
                 <Input
                   id="api-key"
                   name="api-key"
@@ -292,7 +281,10 @@ export default function ProvidersPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-green-600 text-white hover:bg-green-700">
+              <Button
+                type="submit"
+                className="w-full bg-green-600 text-white hover:bg-green-700"
+              >
                 Save API Key
               </Button>
             </form>
@@ -320,7 +312,9 @@ export default function ProvidersPage() {
               {keys.map((key) => (
                 <TableRow key={key.id}>
                   <TableCell className="text-sm">{key.id}</TableCell>
-                  <TableCell className="text-sm">{key.provider.toUpperCase()}</TableCell>
+                  <TableCell className="text-sm">
+                    {key.provider.toUpperCase()}
+                  </TableCell>
                   <TableCell className="text-sm">
                     <div className="flex items-center gap-2">
                       {key.isVisible ? (
@@ -328,7 +322,9 @@ export default function ProvidersPage() {
                           {key.api_key}
                         </code>
                       ) : (
-                        <span className="font-mono text-gray-400">••••••••••••••••</span>
+                        <span className="font-mono text-gray-400">
+                          ••••••••••••••••
+                        </span>
                       )}
                       <Button
                         variant="ghost"
@@ -382,7 +378,9 @@ export default function ProvidersPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Edit API Key</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">
+              Edit API Key
+            </DialogTitle>
             <DialogDescription className="text-sm text-gray-500">
               Update the API key for {currentKey?.provider}.
             </DialogDescription>
@@ -394,7 +392,9 @@ export default function ProvidersPage() {
             autoComplete="off"
           >
             <div className="space-y-2">
-              <Label htmlFor="api-key" className="text-sm font-medium">API Key</Label>
+              <Label htmlFor="api-key" className="text-sm font-medium">
+                API Key
+              </Label>
               <Input
                 id="api-key"
                 name="api-key"
@@ -407,7 +407,10 @@ export default function ProvidersPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full bg-green-600 text-white hover:bg-green-700">
+            <Button
+              type="submit"
+              className="w-full bg-green-600 text-white hover:bg-green-700"
+            >
               Update API Key
             </Button>
           </form>

@@ -58,7 +58,7 @@ export function useAuthGuard() {
           }
         }
 
-        const response = await getUserProfile(token!);
+        const response = await getUserProfile();
         setUser(response);
       } catch (error) {
         console.error("Failed to fetch user:", error);
