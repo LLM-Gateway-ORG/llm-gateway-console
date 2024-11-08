@@ -311,6 +311,7 @@ export default function ProvidersPage() {
           <Table className="w-full">
             <TableHeader>
               <TableRow>
+                <TableHead className="text-left">ID</TableHead>
                 <TableHead className="text-left">Provider Name</TableHead>
                 <TableHead className="text-left">API Key</TableHead>
               </TableRow>
@@ -318,6 +319,7 @@ export default function ProvidersPage() {
             <TableBody>
               {keys.map((key) => (
                 <TableRow key={key.id}>
+                  <TableCell className="text-sm">{key.id}</TableCell>
                   <TableCell className="text-sm">{key.provider.toUpperCase()}</TableCell>
                   <TableCell className="text-sm">
                     <div className="flex items-center gap-2">
