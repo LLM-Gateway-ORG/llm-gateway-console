@@ -41,9 +41,10 @@ interface SidebarProps {
     lastname: string;
     email: string;
   };
+  children: React.ReactNode;
 }
 
-export default function SidebarComponent({ user }: SidebarProps) {
+export default function SidebarComponent({ user, children }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -155,11 +156,16 @@ export default function SidebarComponent({ user }: SidebarProps) {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-16 items-center gap-4 border-b px-6">
+        <header className="flex h-16 items-center gap-4 border-b px-6 justify-between">
           <SidebarTrigger />
           {/* Add your header content here */}
+          <h1 className="text-xl font-bold text-gray-800">
+            Welcome back,{" "}
+            <span className="text-blue-600">{user.firstname || "User"}</span>!
+          </h1>
         </header>
         {/* Add your main content here */}
+        {children}
       </SidebarInset>
     </SidebarProvider>
   );
