@@ -66,7 +66,7 @@ export default function SidebarComponent({ user }: SidebarProps) {
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <span className="font-bold text-[#1a1a1a]">LLM Gateway</span>
-                    <span className="text-xs text-[#666666]">v1.0.0</span>
+                    <span className="text-xs text-[#666666]">Beta</span>
                   </div>
                 </Link>
               </SidebarMenuButton>

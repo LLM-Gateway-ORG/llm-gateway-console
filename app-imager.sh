@@ -4,11 +4,14 @@
 if [ "$1" == "--local" ]; then
     ENV_VAR="http://localhost"
     ENV_TAG="local"
-elif [ "$1" == "--prod" ]; then
+elif [ "$1" == "--dev" ]; then
     ENV_VAR="http://ec2-13-201-85-148.ap-south-1.compute.amazonaws.com"
+    ENV_TAG="dev"
+elif [ "$1" == "--prod" ]; then
+    ENV_VAR="https://llmgateway.oderna.in/"
     ENV_TAG="prod"
 else
-    echo "Error: Please specify either --local or --prod"
+    echo "Error: Please specify either --local, --dev or --prod"
     exit 1
 fi
 
