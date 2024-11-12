@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Github, Linkedin, MessageSquare, Check, Calendar, ArrowRight, Zap, Shield, Cpu } from "lucide-react";
+import { Calendar, ArrowRight, Zap, Shield, Cpu } from "lucide-react";
+import { Icons } from "@/components/icons";
 import { toast } from "@/hooks/use-toast";
-import { redirect } from "next/dist/server/api-utils";
 
 export default function LandingPage() {
   const [email, setEmail] = useState("");
@@ -151,10 +151,10 @@ export default function LandingPage() {
             <p className="text-slate-500">&copy; 2024 LLM Gateway. All rights reserved.</p>
             <div className="flex space-x-6">
               <a href="#" className="text-slate-400 hover:text-slate-500">
-                <Github className="h-6 w-6" />
+                <Icons.github className="h-6 w-6" />
               </a>
               <a href="#" className="text-slate-400 hover:text-slate-500">
-                <Linkedin className="h-6 w-6" />
+                <Icons.linkedin className="h-6 w-6" />
               </a>
             </div>
           </div>
