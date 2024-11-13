@@ -1,11 +1,12 @@
 import axios from "axios";
 import { api } from "@/lib/utils";
 
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 export async function signIn(email: string, password: string) {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/`,
-    { username: email, password }
-  );
+  const response = await axios.post(`/api/auth/login/`, {
+    username: email,
+    password,
+  });
   return response.data;
 }
 
@@ -20,16 +21,13 @@ export async function signUp({
   email: string;
   password: string;
 }) {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register/`,
-    {
-      firstname: firstName,
-      lastname: lastName,
-      username: email,
-      email,
-      password,
-    }
-  );
+  const response = await axios.post(`/api/auth/register/`, {
+    firstname: firstName,
+    lastname: lastName,
+    username: email,
+    email,
+    password,
+  });
   return response.data;
 }
 

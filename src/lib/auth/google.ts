@@ -1,6 +1,8 @@
 import axios from "axios";
 import { api } from "@/lib/utils";
 
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
+
 export async function initiateGoogleLogin() {
   try {
     const { data } = await axios.get(`/api/auth/google/login/`);
