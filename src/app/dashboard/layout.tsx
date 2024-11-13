@@ -22,21 +22,7 @@ export default function DashboardLayout({
     <div className="flex flex-col h-screen bg-gray-50">
       <div className="flex flex-1">
         <Sidebar user={user}>
-          <main className="flex-1 p-6 m-4">
-            {/* <div className="border-b pb-4 mb-6">
-              <h1 className="text-3xl font-bold text-gray-800">
-                Welcome back,{" "}
-                <span className="text-blue-600">
-                  {user.firstname || "User"}
-                </span>
-                !
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Manage your API keys and view your analytics
-              </p>
-            </div> */}
-            {children}
-          </main>
+          <main className="flex-1 px-4 m-4">{children}</main>
         </Sidebar>
       </div>
     </div>

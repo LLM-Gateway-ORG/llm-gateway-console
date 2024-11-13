@@ -30,6 +30,22 @@ interface CreateKeyForm {
   name: string;
 }
 
+// Add this function above the ModelsPage component
+function getExampleCurlCommand(baseUrl: string) {
+  return `curl --location '${baseUrl}/api/provider/generate/completion/' \\
+--header 'x-api-key: <API Key>' \\
+--data '{
+    "provider_id": "<Provider ID>",
+    "model_name": "<Model Name>",
+    "messages": [
+        {
+            "role": "user",
+            "content": "<Message>"
+        }
+    ]
+}'`;
+}
+
 export default function ApiKeysPage() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateKeyForm>({
@@ -133,19 +149,19 @@ export default function ApiKeysPage() {
   };
 
   return (
-    <div className="space-y-8 min-h-screen">
+    <div className="space-y-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">API Keys</h1>
       </div>
 
       <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
-        <CardHeader className="space-y-1">
-          <CardTitle>API Key Management</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Create and manage your API keys
-          </p>
-        </CardHeader>
-        <CardContent>
+        <CardHeader className="flex flex-row justify-between items-center gap-2 space-y-1">
+          <div className="flex flex-col gap-2 justify-left items-start">
+            <CardTitle>API Key Management</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Create and manage your API keys
+            </p>
+          </div>
           {/* Create new API key section */}
           <div className="mb-6">
             <Button onClick={() => setShowCreateModal(true)}>
@@ -153,19 +169,21 @@ export default function ApiKeysPage() {
               Create New API Key
             </Button>
           </div>
-
+        </CardHeader>
+        <CardContent>
           {/* New API Key Alert */}
           {newApiKey && (
-            <Alert className="mb-6">
-              <AlertCircle className="h-4 w-4" />
+            <Alert className="mb-6 bg-green-500/10">
+              {/* <AlertCircle className="h-4 w-4" /> */}
               <AlertTitle>New API Key Generated</AlertTitle>
-              <AlertDescription className="mt-2 flex items-center justify-between">
-                <code className="relative rounded bg-muted px-[0.5rem] py-[0.2rem] font-mono text-sm">
+              <AlertDescription className="mt-2 flex items-center justify-left gap-1">
+                <code className="relative rounded bg-muted px-[0.5rem] py-[0.2rem] font-mono text-sm text-muted-foreground">
                   {newApiKey}
                 </code>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="border-none"
                   onClick={() => copyToClipboard(newApiKey)}
                 >
                   <Copy className="h-4 w-4" />
@@ -175,7 +193,7 @@ export default function ApiKeysPage() {
           )}
 
           {/* API Keys List */}
-          <div className="rounded-md border">
+          <div className="rounded-md border max-h-[400px] overflow-y-auto">
             {loading ? (
               <div className="p-4 space-y-4">
                 {[...Array(3)].map((_, i) => (
@@ -238,6 +256,56 @@ export default function ApiKeysPage() {
                 </TableBody>
               </Table>
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* API Usage */}
+      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
+        <CardHeader className="space-y-1">
+          <CardTitle>API Usage</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Example curl command for API integration
+          </p>
+        </CardHeader>
+        <CardContent>
+          <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto">
+            <code>
+              {getExampleCurlCommand(process.env.NEXT_PUBLIC_API_URL || "")}
+            </code>
+          </pre>
+          <div className="mt-4 space-y-3">
+            <h4 className="font-semibold">Variable Descriptions:</h4>
+            <ul className="list-disc pl-4 space-y-2">
+              <li>
+                <span className="font-medium">API Key:</span> Your unique
+                authentication key. Find it in your{" "}
+                <a
+                  href="/dashboard/apikeys"
+                  className="text-blue-500 hover:underline"
+                >
+                  API Settings
+                </a>
+              </li>
+              <li>
+                <span className="font-medium">Provider ID:</span> The unique
+                identifier for your AI provider. View available providers in{" "}
+                <a
+                  href="/dashboard/providers"
+                  className="text-blue-500 hover:underline"
+                >
+                  Providers
+                </a>
+              </li>
+              <li>
+                <span className="font-medium">Model Name:</span> The specific
+                model you want to use. See the table above for available models
+              </li>
+              <li>
+                <span className="font-medium">Message:</span> Your input prompt
+                or message to the AI model
+              </li>
+            </ul>
           </div>
         </CardContent>
       </Card>

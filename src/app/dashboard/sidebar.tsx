@@ -156,7 +156,7 @@ export default function SidebarComponent({ user, children }: SidebarProps) {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-16 items-center gap-4 border-b px-6 justify-between">
+        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b px-6 justify-between bg-white">
           <SidebarTrigger />
           {/* Add your header content here */}
           <h1 className="text-xl font-bold text-gray-800">

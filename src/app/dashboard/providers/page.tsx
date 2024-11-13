@@ -216,7 +216,7 @@ export default function ProvidersPage() {
   };
 
   return (
-    <div className="space-y-8 min-h-screen">
+    <div className="space-y-8">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Providers</h1>
@@ -229,7 +229,7 @@ export default function ProvidersPage() {
           <DialogTrigger asChild>
             <Button className="flex items-center space-x-2 bg-blue-600 text-white hover:bg-blue-700">
               <Plus className="h-5 w-5" />
-              <span>Add API Key</span>
+              <span>Add Providers</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -311,8 +311,10 @@ export default function ProvidersPage() {
             <TableBody>
               {keys.map((key) => (
                 <TableRow key={key.id}>
-                  <TableCell className="text-sm">{key.id}</TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="text-sm whitespace-nowrap max-w-[100px] truncate">
+                    {key.id}
+                  </TableCell>
+                  <TableCell className="text-sm whitespace-nowrap">
                     {key.provider.toUpperCase()}
                   </TableCell>
                   <TableCell className="text-sm">
