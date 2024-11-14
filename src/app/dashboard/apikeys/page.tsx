@@ -32,7 +32,7 @@ interface CreateKeyForm {
 
 // Add this function above the ModelsPage component
 function getExampleCurlCommand(baseUrl: string) {
-  return `curl --location '${baseUrl}/api/provider/generate/completion/' \\
+  return `curl --location '${baseUrl}api/provider/generate/completion/' \\
 --header 'x-api-key: <API Key>' \\
 --data '{
     "provider_id": "<Provider ID>",
