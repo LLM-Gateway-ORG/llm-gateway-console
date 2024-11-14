@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
-import { AlertCircle, Copy, Key, Loader2 } from "lucide-react";
+import { Copy, Key, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createApiKey, getApiKeys, revokeApiKey } from "@/lib/apikeys";

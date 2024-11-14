@@ -6,7 +6,7 @@ export interface ProviderKey {
 }
 
 export interface AIModel {
-  name: string;
+  model_name: string;
   provider: string;
   developer: string;
 }

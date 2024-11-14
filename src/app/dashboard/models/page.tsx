@@ -44,7 +44,7 @@ export default function ModelsPage() {
       const data = await getAIModels();
       setModels(
         data.models.map((model) => ({
-          name: model.name,
+          name: model.model_name,
           provider: model.provider,
           developer: model.developer,
         }))
@@ -139,7 +139,7 @@ export default function ModelsPage() {
                     <TableRow className="bg-gray-50/50 dark:bg-gray-900/50 hover:bg-gray-50/50 dark:hover:bg-gray-900/50">
                       <TableHead className="font-semibold">Name</TableHead>
                       <TableHead className="font-semibold">Provider</TableHead>
-                      <TableHead className="font-semibold">Developer</TableHead>
+                      {/* <TableHead className="font-semibold">Developer</TableHead> */}
                       <TableHead className="font-semibold text-right">
                         Status
                       </TableHead>
@@ -164,11 +164,11 @@ export default function ModelsPage() {
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        {/* <TableCell>
                           <span className="text-gray-600 dark:text-gray-300">
                             {model.developer}
                           </span>
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell className="text-right">
                           <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
                             Active
