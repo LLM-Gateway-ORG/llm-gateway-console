@@ -2,6 +2,7 @@ import axios from "axios";
 import { api } from "@/lib/utils";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
+
 export async function signIn(email: string, password: string) {
   const response = await axios.post(`/api/auth/login/`, {
     username: email,
@@ -40,6 +41,19 @@ export const resetPassword = async (
       old_password: oldPassword,
       new_password: newPassword,
     },
+  });
+
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error("Failed to reset password");
+  }
+
+  return response.data;
+};
+
+// Subscribe Newsletter
+export const subscribeNewsletter = async (email: string) => {
+  const response = await axios.post("/api/auth/newsletter/", {
+    email,
   });
 
   if (response.status < 200 || response.status >= 300) {

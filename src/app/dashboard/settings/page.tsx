@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import toast from "react-hot-toast";
 import { resetPassword } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +43,6 @@ const passwordFormSchema = z
 
 export default function Settings() {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof passwordFormSchema>>({
     resolver: zodResolver(passwordFormSchema),
@@ -60,17 +59,14 @@ export default function Settings() {
     try {
       await resetPassword(values.oldPassword, values.newPassword);
       form.reset();
-      toast({
-        title: "Success",
-        description: "Your password has been updated successfully.",
+      toast.success("Your password has been updated successfully.", {
+        position: "top-right",
       });
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to update password",
-        variant: "destructive",
-      });
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update password",
+        { position: "top-right" }
+      );
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +76,9 @@ export default function Settings() {
     <div className="container flex-1 space-y-8">
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800 tracking-tight">Settings</h2>
+          <h2 className="text-3xl font-bold text-gray-800 tracking-tight">
+            Settings
+          </h2>
           <p className="text-gray-600 mt-1">
             Manage your account settings and preferences.
           </p>
@@ -112,6 +110,7 @@ export default function Settings() {
                             type="password"
                             disabled={isLoading}
                             placeholder="Enter your current password"
+                            maxLength={100}
                             {...field}
                           />
                         </FormControl>
@@ -131,6 +130,7 @@ export default function Settings() {
                             type="password"
                             disabled={isLoading}
                             placeholder="Enter your new password"
+                            maxLength={100}
                             {...field}
                           />
                         </FormControl>
@@ -150,6 +150,7 @@ export default function Settings() {
                             type="password"
                             disabled={isLoading}
                             placeholder="Confirm your new password"
+                            maxLength={100}
                             {...field}
                           />
                         </FormControl>
@@ -159,7 +160,11 @@ export default function Settings() {
                   />
                 </div>
                 <div className="flex justify-end">
-                  <Button className="bg-blue-600 text-white hover:bg-blue-700" type="submit" disabled={isLoading}>
+                  <Button
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    type="submit"
+                    disabled={isLoading}
+                  >
                     {isLoading && (
                       <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                     )}

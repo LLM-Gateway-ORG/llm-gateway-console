@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-hot-toast";
 import { Copy, Key, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -61,10 +61,8 @@ export default function ApiKeysPage() {
       setApiKeys(keys);
     } catch (err: unknown) {
       const error = err as Error;
-      toast({
-        title: "Error",
-        description: error.message || "Failed to fetch API keys",
-        variant: "destructive",
+      toast.error(error.message || "Failed to fetch API keys", {
+        position: "top-right",
       });
     }
   };
@@ -75,10 +73,8 @@ export default function ApiKeysPage() {
 
   const createNewApiKey = async () => {
     if (!formData.name) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
+      toast.error("Please fill in all fields", {
+        position: "top-right",
       });
       return;
     }
@@ -104,16 +100,11 @@ export default function ApiKeysPage() {
       setShowCreateModal(false);
       console.log(newApiKey);
 
-      toast({
-        title: "Success",
-        description: "API key created successfully",
-      });
+      toast.success("API key created successfully", { position: "top-right" });
     } catch (err: unknown) {
       const error = err as Error;
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create API key",
-        variant: "destructive",
+      toast.error(error.message || "Failed to create API key", {
+        position: "top-right",
       });
     } finally {
       setLoading(false);
@@ -126,26 +117,18 @@ export default function ApiKeysPage() {
 
       setApiKeys(apiKeys.filter((key) => key.id !== keyId));
 
-      toast({
-        title: "Success",
-        description: "API key revoked successfully",
-      });
+      toast.success("API key revoked successfully", { position: "top-right" });
     } catch (err: unknown) {
       const error = err as Error;
-      toast({
-        title: "Error",
-        description: error.message || "Failed to revoke API key",
-        variant: "destructive",
+      toast.error(error.message || "Failed to revoke API key", {
+        position: "top-right",
       });
     }
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast({
-      title: "Success",
-      description: "Copied to clipboard",
-    });
+    toast.success("Copied to clipboard", { position: "top-right" });
   };
 
   return (
@@ -327,6 +310,7 @@ export default function ApiKeysPage() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, name: e.target.value }))
                 }
+                maxLength={100}
               />
             </div>
           </div>

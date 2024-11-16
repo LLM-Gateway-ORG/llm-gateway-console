@@ -35,7 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
+import toast from "react-hot-toast";
 import {
   getProviders,
   createProvider,
@@ -60,7 +60,6 @@ export default function ProvidersPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [providersList, setProvidersList] = useState<string[]>([]);
-  const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentKey, setCurrentKey] = useState<ProviderKey | null>(null);
 
@@ -89,10 +88,8 @@ export default function ProvidersPage() {
       );
     } catch (err: unknown) {
       const error = err as Error;
-      toast({
-        title: "Error",
-        description: error.message || "Failed to fetch providers",
-        variant: "destructive",
+      toast.error(error.message || "Failed to fetch providers", {
+        position: "top-right",
       });
     } finally {
       setIsLoading(false);
@@ -121,16 +118,11 @@ export default function ProvidersPage() {
         { ...newProvider, createdAt: new Date(), isVisible: false },
       ]);
       setIsDialogOpen(false);
-      toast({
-        title: "Success",
-        description: "Provider created successfully",
-      });
+      toast.success("Provider created successfully", { position: "top-right" });
     } catch (err: unknown) {
       const error = err as Error;
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create provider",
-        variant: "destructive",
+      toast.error(error.message || "Failed to create provider", {
+        position: "top-right",
       });
     } finally {
       setIsLoading(false);
@@ -142,16 +134,11 @@ export default function ProvidersPage() {
       setIsLoading(true);
       await deleteProvider(keyId);
       setKeys(keys.filter((k) => k.id !== keyId));
-      toast({
-        title: "Success",
-        description: "Provider deleted successfully",
-      });
+      toast.success("Provider deleted successfully", { position: "top-right" });
     } catch (err: unknown) {
       const error = err as Error;
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete provider",
-        variant: "destructive",
+      toast.error(error.message || "Failed to delete provider", {
+        position: "top-right",
       });
     } finally {
       setIsLoading(false);
@@ -199,16 +186,11 @@ export default function ProvidersPage() {
         )
       );
       setIsEditDialogOpen(false);
-      toast({
-        title: "Success",
-        description: "API Key updated successfully",
-      });
+      toast.success("API Key updated successfully", { position: "top-right" });
     } catch (err: unknown) {
       const error = err as Error;
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update API Key",
-        variant: "destructive",
+      toast.error(error.message || "Failed to update API Key", {
+        position: "top-right",
       });
     } finally {
       setIsLoading(false);
@@ -278,6 +260,7 @@ export default function ProvidersPage() {
                   required
                   autoComplete="new-password"
                   className="border-gray-300"
+                  maxLength={100}
                 />
               </div>
 
@@ -406,6 +389,7 @@ export default function ProvidersPage() {
                 required
                 autoComplete="new-password"
                 className="border-gray-300"
+                maxLength={100}
               />
             </div>
 
