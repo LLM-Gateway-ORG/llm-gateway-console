@@ -22,12 +22,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Button } from "@/components/ui/button";
 // import { RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // You might want to replace this with your actual model type
 interface Model {
   name: string;
   provider: string;
   developer: string;
+  active: Boolean;
 }
 
 export default function ModelsPage() {
@@ -37,6 +40,7 @@ export default function ModelsPage() {
   const [availableProviders, setAvailableProviders] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState(false);
 
   const fetchModels = async () => {
     setIsLoading(true);
@@ -47,6 +51,7 @@ export default function ModelsPage() {
           name: model.model_name,
           provider: model.provider,
           developer: model.developer,
+          active: model.active,
         }))
       );
       setAvailableProviders(data.available_providers);
@@ -62,18 +67,34 @@ export default function ModelsPage() {
   }, []);
 
   // Memoize filtered models for better performance
-  const filteredModels = useMemo(
-    () =>
-      models.filter((model) => {
+  // Memoize filtered models for better performance
+  const filteredModels = useMemo(() => {
+    return models
+      .filter((model) => {
+        // Check if model name matches search query
         const matchesSearch = model.name
           .toLowerCase()
           .includes(searchQuery.toLowerCase());
+
+        // Check if model matches selected provider
         const matchesProvider =
           providerFilter === "all" || model.provider === providerFilter;
-        return matchesSearch && matchesProvider;
-      }),
-    [models, searchQuery, providerFilter]
-  );
+
+        // Check active status filter
+        const matchesActiveFilter = !activeFilter || model.active;
+
+        // Return true if all conditions are met
+        return matchesSearch && matchesProvider && matchesActiveFilter;
+      })
+      .sort((a, b) => {
+        // First sort by active status (active ones first)
+        if (a.active !== b.active) {
+          return a.active ? -1 : 1;
+        }
+        // Then sort alphabetically by name
+        return a.name.localeCompare(b.name);
+      });
+  }, [models, searchQuery, providerFilter, activeFilter]);
 
   return (
     <div className="space-y-8">
@@ -95,12 +116,24 @@ export default function ModelsPage() {
         <CardContent>
           <div className="flex gap-4 mb-6">
             <div className="flex-1">
-              <Input
-                placeholder="Search models..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-sm"
-              />
+              <div className="flex flex-row items-center gap-4">
+                <Input
+                  placeholder="Search models..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="max-w-sm"
+                />
+                <div className="flex gap-1 items-center">
+                  <Switch
+                    id="only_active"
+                    checked={activeFilter}
+                    onCheckedChange={() => {
+                      setActiveFilter((prev) => !prev);
+                    }}
+                  />
+                  <Label>Active</Label>
+                </div>
+              </div>
             </div>
             <Select value={providerFilter} onValueChange={setProviderFilter}>
               <SelectTrigger className="w-[180px]">
@@ -153,7 +186,12 @@ export default function ModelsPage() {
                       >
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            {model.active ? (
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            ) : (
+                              <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                            )}
+
                             {model.name}
                           </div>
                         </TableCell>
@@ -170,9 +208,15 @@ export default function ModelsPage() {
                           </span>
                         </TableCell> */}
                         <TableCell className="text-right">
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-                            Active
-                          </span>
+                          {model.active ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                              Active
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                              Inactive
+                            </span>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
