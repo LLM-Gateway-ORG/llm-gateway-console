@@ -14,7 +14,15 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
+  SidebarGroupLabel,
+  // SidebarGroupContent,
+  SidebarGroup,
 } from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@radix-ui/react-collapsible";
 import {
   Bot,
   Key,
@@ -22,6 +30,8 @@ import {
   Settings,
   LogOut,
   User,
+  Activity,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -33,6 +43,17 @@ const sidebarItems = [
   { icon: Bot, label: "Models", href: "/dashboard/models" },
   { icon: Key, label: "Providers", href: "/dashboard/providers" },
   { icon: Key, label: "API Keys", href: "/dashboard/apikeys" },
+  {
+    icon: Activity,
+    label: "Analytics",
+    subItems: [
+      {
+        icon: Key,
+        label: "Prompt History",
+        href: "/dashboard/analytics/prompt-history",
+      },
+    ],
+  },
 ];
 
 interface SidebarProps {
@@ -89,23 +110,77 @@ export default function SidebarComponent({ user, children }: SidebarProps) {
         <SidebarContent>
           <ScrollArea className="h-[calc(100vh-8rem)]">
             <SidebarMenu className="space-y-1.5 p-4">
-              {sidebarItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    className={cn(
-                      "hover:bg-[#4285F4]/10",
-                      pathname === item.href && "bg-[#4285F4]/10 text-[#4285F4]"
-                    )}
-                  >
-                    <Link href={item.href} className="font-bold">
-                      <item.icon className="mr-3 h-4 w-4" />
-                      {item.label}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {sidebarItems.map((item) => {
+                // If item has href, render as a link
+                if (item?.href) {
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.href}
+                        className={cn(
+                          "hover:bg-[#4285F4]/10",
+                          pathname === item.href &&
+                            "bg-[#4285F4]/10 text-[#4285F4]"
+                        )}
+                      >
+                        <Link
+                          href={item.href}
+                          className="font-bold flex items-center"
+                        >
+                          <item.icon className="mr-3 h-4 w-4" />
+                          {item.label}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
+                // If item is a collapsible section
+                if (item?.subItems) {
+                  return (
+                    <Collapsible
+                      key={item.label}
+                      defaultOpen
+                      className="group/collapsible"
+                    >
+                      <SidebarGroup>
+                        <SidebarGroupLabel asChild>
+                          <CollapsibleTrigger className="flex items-center text-lg hover:bg-gray-200">
+                            {item.label}
+                            <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                          </CollapsibleTrigger>
+                        </SidebarGroupLabel>
+                        <CollapsibleContent>
+                          {item.subItems.map((subItem) => (
+                            <SidebarMenuItem key={subItem.href}>
+                              <SidebarMenuButton
+                                asChild
+                                className={cn(
+                                  "hover:bg-[#4285F4]/10",
+                                  pathname === subItem.href &&
+                                    "bg-[#4285F4]/10 text-[#4285F4]"
+                                )}
+                              >
+                                <Link
+                                  href={subItem.href}
+                                  className="font-bold flex items-center"
+                                >
+                                  <subItem.icon className="mr-3 h-4 w-4" />
+                                  {subItem.label}
+                                </Link>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          ))}
+                        </CollapsibleContent>
+                      </SidebarGroup>
+                    </Collapsible>
+                  );
+                }
+
+                // Default case
+                return null;
+              })}
             </SidebarMenu>
           </ScrollArea>
         </SidebarContent>

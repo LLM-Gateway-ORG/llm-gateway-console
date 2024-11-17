@@ -67,7 +67,6 @@ export default function ModelsPage() {
   }, []);
 
   // Memoize filtered models for better performance
-  // Memoize filtered models for better performance
   const filteredModels = useMemo(() => {
     return models
       .filter((model) => {
