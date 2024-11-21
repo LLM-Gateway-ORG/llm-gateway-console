@@ -94,7 +94,7 @@ export default function ProvidersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]); // Add dependencies used inside the callback
+  }, []); // Removed 'toast' from dependencies
 
   useEffect(() => {
     fetchAiModels();

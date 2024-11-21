@@ -30,7 +30,7 @@ interface Model {
   name: string;
   provider: string;
   developer: string;
-  active: Boolean;
+  active: boolean;
 }
 
 export default function ModelsPage() {

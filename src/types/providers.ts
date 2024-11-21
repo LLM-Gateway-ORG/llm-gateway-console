@@ -9,7 +9,7 @@ export interface AIModel {
   model_name: string;
   provider: string;
   developer: string;
-  active: Boolean;
+  active: boolean;
 }
 
 export interface ModelsResponse {
