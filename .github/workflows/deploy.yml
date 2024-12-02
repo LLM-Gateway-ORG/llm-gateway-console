@@ -34,33 +34,37 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Determine environment and API URL
+        id: env-setup
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "ENV_TAG=prod" >> $GITHUB_ENV
+            echo "ENV_VAR=https://llmgateway.oderna.in/" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/development" ]]; then
+            echo "ENV_TAG=dev" >> $GITHUB_ENV
+            echo "ENV_VAR=http://ec2-13-201-85-148.ap-south-1.compute.amazonaws.com" >> $GITHUB_ENV
+
       - name: Generate timestamp
         id: timestamp
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
 
-      - name: Set Dockerfile and tags based on branch
-        id: docker-config
+      - name: Build Docker image
         run: |
-          if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
-            echo "dockerfile=Dockerfile" >> $GITHUB_OUTPUT
-            echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.timestamp.outputs.timestamp }}" >> $GITHUB_OUTPUT
-          else
-            echo "dockerfile=Dockerfile" >> $GITHUB_OUTPUT
-            echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev-latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev-${{ steps.timestamp.outputs.timestamp }}" >> $GITHUB_OUTPUT
-          fi
+          VERSIONED_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.timestamp.outputs.timestamp }}-${{ env.ENV_TAG }}"
+          LATEST_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-${{ env.ENV_TAG }}"
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ${{ steps.docker-config.outputs.dockerfile }}
-          push: true
-          tags: ${{ steps.docker-config.outputs.tags }}
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          echo "[+] Building Image with tag: $VERSIONED_TAG..."
+          docker build --build-arg NEXT_PUBLIC_API_URL=${{ env.ENV_VAR }} -t $VERSIONED_TAG .
+
+          echo "[+] Tagging Image as $LATEST_TAG..."
+          docker tag $VERSIONED_TAG $LATEST_TAG
+
+          echo "[+] Pushing Images to Docker Hub..."
+          docker push $VERSIONED_TAG
+          docker push $LATEST_TAG
 
       - name: Print image details
         run: |
           echo "Built and pushed images:"
-          echo "Dockerfile: ${{ steps.docker-config.outputs.dockerfile }}"
-          echo "Tags: ${{ steps.docker-config.outputs.tags }}"
+          echo "VERSIONED_TAG: $VERSIONED_TAG"
+          echo "LATEST_TAG: $LATEST_TAG"
