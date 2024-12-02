@@ -42,7 +42,8 @@ jobs:
             echo "ENV_VAR=https://llmgateway.oderna.in/" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/development" ]]; then
             echo "ENV_TAG=dev" >> $GITHUB_ENV
-            echo "ENV_VAR=http://ec2-13-201-85-148.ap-south-1.compute.amazonaws.com" >> $GITHUB_ENV
+            echo "ENV_VAR=http://ec2-13-201-85-148.ap-south-1.compute.amazonaws.com/" >> $GITHUB_ENV
+          fi
 
       - name: Generate timestamp
         id: timestamp
