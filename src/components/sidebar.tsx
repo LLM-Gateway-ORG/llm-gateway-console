@@ -14,7 +14,14 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
+  SidebarGroupLabel,
+  SidebarGroup,
 } from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@radix-ui/react-collapsible";
 import {
   Bot,
   Key,
@@ -22,18 +29,12 @@ import {
   Settings,
   LogOut,
   User,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-const sidebarItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: Bot, label: "Models", href: "/dashboard/models" },
-  { icon: Key, label: "Providers", href: "/dashboard/providers" },
-  { icon: Key, label: "API Keys", href: "/dashboard/apikeys" },
-];
 
 interface SidebarProps {
   user: {
@@ -41,25 +42,20 @@ interface SidebarProps {
     lastname: string;
     email: string;
   };
+  CustomSidebarMenu: React.JSX.Element;
+  children: React.ReactNode;
 }
 
-export default function SidebarComponent({ user }: SidebarProps) {
+export default function SidebarComponent({ user, CustomSidebarMenu, children }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
   const handleLogout = () => {
-    // Clear localStorage
     localStorage.clear();
-
-    // Clear all cookies
     document.cookie.split(";").forEach((cookie) => {
-      const eqPos = cookie.indexOf("=");
-      const name =
-        eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+      const name = cookie.split("=")[0]?.trim();
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
     });
-
-    // Redirect to auth page
     router.push("/auth");
   };
 
@@ -71,14 +67,16 @@ export default function SidebarComponent({ user }: SidebarProps) {
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
                 <Link href="/">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[#4285F4] text-white">
-                    <Bot className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <span className="font-bold text-[#1a1a1a]">
-                      LLM Gateway
-                    </span>
-                    <span className="text-xs text-[#666666]">Beta</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex aspect-square w-8 items-center justify-center rounded-lg bg-[#4285F4] text-white">
+                      <Bot className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <span className="block font-bold text-[#1a1a1a]">
+                        LLM Gateway
+                      </span>
+                      <span className="text-xs text-[#666666]">Beta</span>
+                    </div>
                   </div>
                 </Link>
               </SidebarMenuButton>
@@ -88,23 +86,59 @@ export default function SidebarComponent({ user }: SidebarProps) {
         <SidebarContent>
           <ScrollArea className="h-[calc(100vh-8rem)]">
             <SidebarMenu className="space-y-1.5 p-4">
-              {sidebarItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    className={cn(
-                      "hover:bg-[#4285F4]/10",
-                      pathname === item.href && "bg-[#4285F4]/10 text-[#4285F4]"
-                    )}
-                  >
-                    <Link href={item.href} className="font-bold">
-                      <item.icon className="mr-3 h-4 w-4" />
-                      {item.label}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {CustomSidebarMenu}
+              {/* {sidebarItems.map((item) =>
+                item.href ? (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
+                      className={cn(
+                        "hover:bg-[#4285F4]/10",
+                        pathname === item.href &&
+                          "bg-[#4285F4]/10 text-[#4285F4]"
+                      )}
+                    >
+                      <Link href={item.href} className="font-bold flex items-center">
+                        <item.icon className="mr-3 h-4 w-4" />
+                        {item.label}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ) : item.subItems ? (
+                  <Collapsible key={item.label} defaultOpen>
+                    <SidebarGroup>
+                      <SidebarGroupLabel asChild>
+                        <CollapsibleTrigger className="flex items-center text-lg hover:bg-gray-200">
+                          {item.label}
+                          <ChevronDown className="ml-auto transition-transform rotate-0 group-data-[state=open]:rotate-180" />
+                        </CollapsibleTrigger>
+                      </SidebarGroupLabel>
+                      <CollapsibleContent>
+                        {item.subItems.map((subItem) => (
+                          <SidebarMenuItem key={subItem.href}>
+                            <SidebarMenuButton
+                              asChild
+                              className={cn(
+                                "hover:bg-[#4285F4]/10",
+                                pathname === subItem.href &&
+                                  "bg-[#4285F4]/10 text-[#4285F4]"
+                              )}
+                            >
+                              {subItem.href ? (
+                                <Link href={subItem.href}>
+                                  <subItem.icon className="mr-3 h-4 w-4" />
+                                  {subItem.label}
+                                </Link>
+                              ) : null}
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        ))}
+                      </CollapsibleContent>
+                    </SidebarGroup>
+                  </Collapsible>
+                ) : null
+              )} */}
             </SidebarMenu>
           </ScrollArea>
         </SidebarContent>
@@ -121,7 +155,6 @@ export default function SidebarComponent({ user }: SidebarProps) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-
             <Separator className="my-4" />
 
             <div className="flex items-center gap-3 pr-2">
@@ -140,7 +173,6 @@ export default function SidebarComponent({ user }: SidebarProps) {
                 </span>
               </div>
             </div>
-
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={handleLogout}
@@ -155,11 +187,14 @@ export default function SidebarComponent({ user }: SidebarProps) {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-16 items-center gap-4 border-b px-6">
+        <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b px-6 justify-between bg-white">
           <SidebarTrigger />
-          {/* Add your header content here */}
+          <h1 className="text-xl font-bold text-gray-800">
+            Welcome back,{" "}
+            <span className="text-blue-600">{user.firstname || "User"}</span>!
+          </h1>
         </header>
-        {/* Add your main content here */}
+        {children}
       </SidebarInset>
     </SidebarProvider>
   );
