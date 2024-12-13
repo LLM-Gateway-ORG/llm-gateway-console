@@ -98,7 +98,6 @@ export default function ApiKeysPage() {
 
       // Close the modal after successful creation
       setShowCreateModal(false);
-      console.log(newApiKey);
 
       toast.success("API key created successfully", { position: "top-right" });
     } catch (err: unknown) {

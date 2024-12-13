@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { App, AppType } from "./types";
 import {
   Table,
@@ -30,11 +31,11 @@ interface AppListingProps {
 
 function filterApps(apps: App[], filterType: AppType | "all"): App[] {
   if (filterType === "all") return apps;
-  console.log(apps, filterType)
   return apps.filter((app) => app.type === filterType);
 }
 
 export default function AppListing({ initialApps }: AppListingProps) {
+  const router = useRouter();
   const [apps, setApps] = useState(initialApps);
   //   const [sortBy, setSortBy] = useState<keyof App>("name");
   //   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -84,7 +85,7 @@ export default function AppListing({ initialApps }: AppListingProps) {
             <SelectItem value={FeatureTypes.SDK}>SDK</SelectItem>
           </SelectContent>
         </Select>
-    
+
         <Button asChild>
           <Link
             href="/dashboard/apps/create"
@@ -132,7 +133,10 @@ export default function AppListing({ initialApps }: AppListingProps) {
         </TableHeader>
         <TableBody>
           {apps.map((app) => (
-            <TableRow key={app.id}>
+            <TableRow
+              key={app.id}
+              onClick={() => router.push(`/dashboard/apps/${app.id}`)}
+            >
               <TableCell className="text-sm whitespace-nowrap">
                 {app.name}
               </TableCell>

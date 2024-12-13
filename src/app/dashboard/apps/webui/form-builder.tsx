@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { z } from "zod";
 import {
@@ -12,20 +14,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
-import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
+import { MultiSelect } from "@/components/ui/multiple-selector";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { createApp } from "@/lib/apps";
-import { CreateAppRequest } from "@/types/apps";
-import { useRouter } from "next/navigation";
+import { createApp, updateApp } from "@/lib/apps";
+import { AppDetails, CreateAppRequest } from "@/types/apps";
 import { Plus, X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { FeatureTypes } from "../constants";
+import { MultiSelectOption } from "../types";
 
 const appSchema = z.object({
   name: z.string().min(1, "Name is required"),
   supported_models: z
     .array(z.string())
     .min(1, "At least one model must be selected"),
+  instruction: z.string(),
   config: z.object({
     title: z.string().min(1, "Title is required"),
     logo: z.string().url().optional().or(z.literal("")),
@@ -38,7 +42,6 @@ const appSchema = z.object({
 
 type AppFormValues = z.infer<typeof appSchema>;
 
-// Created a separate component for the prompt field
 const PromptField = ({
   field,
   onRemove,
@@ -65,19 +68,26 @@ const PromptField = ({
   </FormItem>
 );
 
-export default function WebUIFormBuilder({ models }: { models: Option[] }) {
-  const router = useRouter();
+interface WebUIAppFormProps {
+  app?: AppDetails;
+  models: MultiSelectOption[];
+}
+
+export default function WebUIAppForm({ app, models }: WebUIAppFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEditMode = !!app;
+
   const form = useForm<AppFormValues>({
     resolver: zodResolver(appSchema),
     defaultValues: {
-      name: "",
-      supported_models: [],
+      name: app?.name || "",
+      supported_models: app?.supported_models || [],
+      instruction: app?.instruction || "",
       config: {
-        title: "",
-        logo: "",
-        bot_name: "",
-        suggested_prompt: [""],
+        title: app?.config.title || "",
+        logo: app?.config.logo || "",
+        bot_name: app?.config.bot_name || "",
+        suggested_prompt: app?.config.suggested_prompt || [""],
       },
     },
   });
@@ -87,14 +97,27 @@ export default function WebUIFormBuilder({ models }: { models: Option[] }) {
     name: "config.suggested_prompt",
   });
 
-  const onSubmit = async (data: CreateAppRequest) => {
+  const onSubmit = async (data: AppFormValues) => {
     try {
-      console.log(data);
       setIsSubmitting(true);
-      await createApp({ ...data, ...{ feature_type: FeatureTypes.WebUI } });
-      router.push("/dashboard/apps");
+      if (isEditMode && app) {
+        await updateApp(app.id, {
+          ...data,
+          feature_type: FeatureTypes.WebUI,
+        } as any);
+      } else {
+        await createApp({
+          ...data,
+          feature_type: FeatureTypes.WebUI,
+        } as CreateAppRequest);
+      }
+
+      if (!isEditMode) window.location.href = "/dashboard/apps";
     } catch (error) {
-      console.error("Failed to create app:", error);
+      console.error(
+        `Failed to ${isEditMode ? "update" : "create"} app:`,
+        error
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -166,6 +189,20 @@ export default function WebUIFormBuilder({ models }: { models: Option[] }) {
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="instruction"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Instructions</FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder="Enter the instruction" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="space-y-4">
             <FormLabel>Suggested Prompts</FormLabel>
             {fields.map((field, index) => (
@@ -194,41 +231,37 @@ export default function WebUIFormBuilder({ models }: { models: Option[] }) {
         <FormField
           control={form.control}
           name="supported_models"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>Supported Models</FormLabel>
-              <MultipleSelector
-                value={models.filter((model) =>
-                  (form.watch("supported_models") || []).includes(model.value)
-                )}
+              <MultiSelect
                 options={models}
-                placeholder="Select models..."
-                emptyIndicator={
-                  <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                    no results found.
-                  </p>
-                }
-                onChange={(newSelected) => {
-                  form.setValue(
-                    "supported_models",
-                    newSelected.map((item: { value: string }) => item.value),
-                    {
-                      shouldValidate: true,
-                    }
-                  );
+                onValueChange={(newSelected) => {
+                  form.setValue("supported_models", newSelected, {
+                    shouldValidate: true,
+                  });
                 }}
+                placeholder="Select models..."
+                variant="inverted"
+                animation={2}
+                maxCount={3}
+                defaultValue={field.value}
               />
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="flex flex-right gap-4 flex-direction-[row-reverse]">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </Button>
-          <Button asChild>
+        <div className="flex justify-end space-x-4">
+          <Button asChild variant="outline">
             <Link href="/dashboard/apps">Cancel</Link>
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? "Saving..."
+              : isEditMode
+              ? "Update App"
+              : "Create App"}
           </Button>
         </div>
       </form>

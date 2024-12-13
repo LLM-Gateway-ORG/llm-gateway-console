@@ -8,16 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Option } from "@/components/ui/multiple-selector";
-import { useRouter } from "next/navigation";
+import { MultiSelectOption } from "../types";
 import { getAIModels } from "@/lib/providers";
-import SdkFormBuilder from "./sdk-builder";
-import WebUIFormBuilder from "./webui-buider";
+import SdkAppForm from "../sdk/form-builder";
+import WebUIAppForm from "../webui/form-builder";
 
 export default function CreateApps() {
-  const router = useRouter();
-  // const [isSubmitting, setIsSubmitting] = useState(false);
-  const [models, setModels] = useState<Option[]>([]);
+  const [models, setModels] = useState<MultiSelectOption[]>([]);
   const [featureType, setFeatureTyoe] = useState("sdk");
 
   const fetchModels = async () => {
@@ -63,10 +60,10 @@ export default function CreateApps() {
         </Select>
       </div>
       {featureType == "sdk" ? (
-        <SdkFormBuilder models={models} />
+        <SdkAppForm models={models} />
       ) : (
-        <WebUIFormBuilder models={models} />
-      )}
+        <WebUIAppForm models={models} />
+      )}  
     </div>
   );
 }

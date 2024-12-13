@@ -7,3 +7,8 @@ export interface App {
   type: string;
   models_count: number;
 }
+
+export interface MultiSelectOption {
+  value: string;
+  label: string;
+}

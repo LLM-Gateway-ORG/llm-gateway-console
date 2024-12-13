@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { z } from "zod";
 import {
@@ -11,21 +13,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import MultipleSelector, { Option } from "@/components/ui/multiple-selector"; // https://shadcnui-expansions.typeart.cc/docs/multiple-selector
+import { MultiSelect } from "@/components/ui/multiple-selector";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { createApp } from "@/lib/apps";
-import { CreateAppRequest } from "@/types/apps";
-import { useRouter } from "next/navigation";
+import { createApp, updateApp } from "@/lib/apps";
 import { Textarea } from "@/components/ui/textarea";
 import { FeatureTypes } from "../constants";
+import { MultiSelectOption } from "../types";
+import { AppDetails, CreateAppRequest } from "@/types/apps";
 
 const appSchema = z.object({
   name: z.string().min(1, "Name is required"),
   supported_models: z
     .array(z.string())
     .min(1, "At least one model must be selected"),
-  instructions: z.string(),
+  instruction: z.string(),
   config: z.object({
     bot_name: z.string().min(1, "Bot name is required"),
   }),
@@ -33,29 +35,47 @@ const appSchema = z.object({
 
 type AppFormValues = z.infer<typeof appSchema>;
 
-export default function SdkFormBuilder({ models }: { models: Option[] }) {
-  const router = useRouter();
+interface AppFormProps {
+  app?: AppDetails;
+  models: MultiSelectOption[];
+}
+
+export default function SdkAppForm({ app, models }: AppFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEditMode = !!app;
+
   const form = useForm<AppFormValues>({
     resolver: zodResolver(appSchema),
     defaultValues: {
-      name: "",
-      supported_models: [],
-      instructions: "",
+      name: app?.name || "",
+      supported_models: app?.supported_models || [],
+      instruction: app?.instruction || "",
       config: {
-        bot_name: "",
+        bot_name: app?.config.bot_name || "",
       },
     },
   });
 
-  const onSubmit = async (data: CreateAppRequest) => {
+  const onSubmit = async (data: AppFormValues) => {
     try {
-      console.log(data);
       setIsSubmitting(true);
-      await createApp({ ...data, ...{ feature_type: FeatureTypes.SDK } });
-      router.push("/dashboard/apps");
+      if (isEditMode && app) {
+        await updateApp(app.id, {
+          ...data,
+          feature_type: FeatureTypes.SDK,
+        } as any);
+      } else {
+        await createApp({
+          ...data,
+          feature_type: FeatureTypes.SDK,
+        } as CreateAppRequest);
+      }
+      if (!isEditMode) window.location.href = "/dashboard/apps";
     } catch (error) {
-      console.error("Failed to create app:", error);
+      console.error(
+        `Failed to ${isEditMode ? "update" : "create"} app:`,
+        error
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -94,7 +114,7 @@ export default function SdkFormBuilder({ models }: { models: Option[] }) {
 
         <FormField
           control={form.control}
-          name="instructions"
+          name="instruction"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Instructions</FormLabel>
@@ -109,41 +129,37 @@ export default function SdkFormBuilder({ models }: { models: Option[] }) {
         <FormField
           control={form.control}
           name="supported_models"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>Supported Models</FormLabel>
-              <MultipleSelector
-                value={models.filter((model) =>
-                  (form.watch("supported_models") || []).includes(model.value)
-                )}
+              <MultiSelect
                 options={models}
-                placeholder="Select models..."
-                emptyIndicator={
-                  <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                    no results found.
-                  </p>
-                }
-                onChange={(newSelected) => {
-                  form.setValue(
-                    "supported_models",
-                    newSelected.map((item: { value: string }) => item.value),
-                    {
-                      shouldValidate: true,
-                    }
-                  );
+                onValueChange={(newSelected) => {
+                  form.setValue("supported_models", newSelected, {
+                    shouldValidate: true,
+                  });
                 }}
+                placeholder="Select models..."
+                variant="inverted"
+                animation={2}
+                maxCount={3}
+                defaultValue={field.value}
               />
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="flex flex-right gap-4 flex-direction-[row-reverse]">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </Button>
-          <Button asChild>
+        <div className="flex justify-end space-x-4">
+          <Button asChild variant="outline">
             <Link href="/dashboard/apps">Cancel</Link>
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? "Saving..."
+              : isEditMode
+              ? "Update App"
+              : "Create App"}
           </Button>
         </div>
       </form>
