@@ -25,7 +25,6 @@ import {
 import {
   Bot,
   Key,
-  LayoutDashboard,
   Settings,
   LogOut,
   User,
@@ -44,10 +43,11 @@ interface SidebarItem {
 }
 
 const sidebarItems: SidebarItem[] = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+  // { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Bot, label: "Models", href: "/dashboard/models" },
   { icon: Key, label: "Providers", href: "/dashboard/providers" },
-  { icon: Key, label: "API Keys", href: "/dashboard/apikeys" },
+  // { icon: Key, label: "API Keys", href: "/dashboard/apikeys" },
+  { icon: Key, label: "Apps", href: "/dashboard/apps" },
   // {
   //   icon: ChevronDown,
   //   label: "Analytics",
