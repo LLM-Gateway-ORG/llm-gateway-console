@@ -22,7 +22,6 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { deleteApp } from "@/lib/apps";
 import Link from "next/link";
-import { Plus } from "lucide-react";
 import { FeatureTypes } from "./constants";
 
 interface AppListingProps {

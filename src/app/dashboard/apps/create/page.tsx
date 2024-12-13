@@ -12,10 +12,11 @@ import { MultiSelectOption } from "../types";
 import { getAIModels } from "@/lib/providers";
 import SdkAppForm from "../sdk/form-builder";
 import WebUIAppForm from "../webui/form-builder";
+import { FeatureTypes } from "../constants";
 
 export default function CreateApps() {
   const [models, setModels] = useState<MultiSelectOption[]>([]);
-  const [featureType, setFeatureTyoe] = useState("sdk");
+  const [featureType, setFeatureType] = useState(FeatureTypes.SDK);
 
   const fetchModels = async () => {
     try {
@@ -46,7 +47,7 @@ export default function CreateApps() {
         <h2>Type</h2>
         <Select
           onValueChange={(value) => {
-            setFeatureTyoe(value);
+            setFeatureType(value);
           }}
           defaultValue={featureType}
         >
@@ -54,12 +55,12 @@ export default function CreateApps() {
             <SelectValue placeholder="Select a feature type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="sdk">SDK</SelectItem>
-            <SelectItem value="webui">WebUI</SelectItem>
+            <SelectItem value={FeatureTypes.SDK}>SDK</SelectItem>
+            <SelectItem value={FeatureTypes.WebUI}>WebUI</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      {featureType == "sdk" ? (
+      {featureType == FeatureTypes.SDK ? (
         <SdkAppForm models={models} />
       ) : (
         <WebUIAppForm models={models} />
